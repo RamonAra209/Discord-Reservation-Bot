@@ -1,9 +1,7 @@
 import asyncio
 from multiprocessing.connection import wait
 import subprocess
-import sys
 import os
-import time
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands
@@ -78,24 +76,32 @@ async def emoji(ctx):
     else:
         await ctx.send(f"{ctx.author.name}, you're not in the database, check your DMs!")
         user_dm = await ctx.author.create_dm()
-        await user_dm.send("How do you want me to reserve you a room if you're not in the database? Answer these next questions so I can add you!")
+        await user_dm.send("**FOR LEGAL PURPOSES I WILL NEVER SHARE YOUR DATA**\nHow do you want me to reserve you a room if you're not in the database? Answer these next questions so I can add you!")
 
         first = None
         last = None
         user_id = None
         user_email = None
+        
+        def check(message):
+            return message.author == ctx.author
         try:
-            await user_dm.send("Whats your first name?: ")
-            first = await client.wait_for('message', timeout=60)
+            await asyncio.sleep(2)
+            await user_dm.send("Whats your first name?")
+            first = await client.wait_for('message', timeout=60, check=check)
+            # await asyncio.sleep(0.75)
 
-            await user_dm.send("Whats your last name?: ")
-            last = await client.wait_for('message', timeout=60)
+            await user_dm.send("Whats your last name?")
+            last = await client.wait_for('message', timeout=60, check=check)
+            # await asyncio.sleep(0.75)
 
-            await user_dm.send("Whats your 989 number?: ")
-            user_id = await client.wait_for('message', timeout=60)
+            await user_dm.send("Whats your 989 number?")
+            user_id = await client.wait_for('message', timeout=60, check=check)
+            # await asyncio.sleep(0.75)
 
-            await user_dm.send("Whats your student email?: ")
-            user_email = await client.wait_for('message', timeout=60)
+            await user_dm.send("Whats your student email?")
+            user_email = await client.wait_for('message', timeout=60, check=check)
+            # await asyncio.sleep(0.75)
         except asyncio.TimeoutError:
             await user_dm.send("You ran out of time to answer!")
 
@@ -118,6 +124,8 @@ async def emoji(ctx):
         data.update(user_dict)
         with open('users.json', 'w') as f:
             json.dump(data, f, indent=4, separators=(", ", ": "), sort_keys=True)
+        
+        await user_dm.send("Successfully added you to the database. If at any point you messed up, call '-delete_me' in the discord server and repeat the steps. Or if you just don't want to be in the database, then that's okay too.")
 
 @client.event
 async def on_reaction_add(reaction, user):
