@@ -1,8 +1,6 @@
 from asyncio import subprocess
 from datetime import date, datetime, timedelta
 from subprocess import call, check_output
-from tabnanny import check
-
 from constants import NUM_EMOJIS
 
 PATH_TO_RESERVE = "python3 /Users/tahpramen/Developer/Personal\ Projects/LRT_V2/main.py"
