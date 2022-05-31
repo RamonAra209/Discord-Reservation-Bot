@@ -7,12 +7,12 @@ import discord
 from discord.ext import commands
 from datetime import date, datetime, timedelta
 from constants import NUM_EMOJIS
-from functions import END_TIME, NOW, ceil_dt, check_output_from_reserve, times_between_xy
+from functions import NOW, ceil_dt, check_output_from_reserve, find_last_time_of_day, get_time_slots, times_between_xy
 import json
 
 load_dotenv("info.env")
 TOKEN = os.getenv('DISCORD_TOKEN')
-PATH_TO_RESERVE = "python3 /Users/tahpramen/Developer/Personal\ Projects/LRT_V2/main.py"
+PATH_TO_RESERVE = "/Users/tahpramen/Developer/Personal\ Projects/LRT_V2/main.py"
 
 intents = discord.Intents.default()
 intents.members = True
@@ -32,21 +32,27 @@ async def reserve(ctx):
         users_json = json.load(f)
 
     if str(ctx.author) in users_json:
-        list_of_times = times_between_xy(ceil_dt(dt=datetime(NOW.year, NOW.month, NOW.day, hour=16, minute=00, second=0),
-                                delta=timedelta(minutes=30)))
+        last_time_of_day_dt_obj = find_last_time_of_day(get_time_slots())
+        list_of_times = times_between_xy(ceil_dt(dt=datetime(NOW.year, NOW.month, NOW.day, hour=NOW.hour, minute=NOW.minute, second=NOW.second),
+                                delta=timedelta(minutes=30)), last_time_of_day_dt_obj)
         str_of_times = [str(i).split(' ')[1] for i in list_of_times]
         str_of_times = [f"{str(i)} {list_of_times[i]}" for i in range(len(list_of_times))]
-
+        
         time_dict = {}
-        for i in str_of_times:
-            split = i.split(' ')
+        for i in range(len(str_of_times)):
+            split = str_of_times[i].split(' ')
+            if i >= 11:
+                break
             time_dict[split[0]] = split[2]
+            
+        for i, val in time_dict.items():
+            print(i, val)
 
         str_to_print = ""
         for key, val in time_dict.items():
             str_to_print += f"{NUM_EMOJIS[int(key)]} {val}\n"
-        
-        message = await ctx.send(f"↓↓↓{ctx.author.mention} React to two time slots, and press check mark when ready, or X to cancel↓↓↓ \n{str_to_print}") 
+         
+        message = await ctx.send(f"{ctx.author.mention} React to two time slots, and press check mark when ready, or X to cancel. Remember you can only schedule in 3 hour blocks per library rules\n{str_to_print}") 
         for key in time_dict.keys():
             await message.add_reaction(NUM_EMOJIS[int(key)])
         await message.add_reaction("\U0000274C") # X Emoji
@@ -130,7 +136,7 @@ async def on_reaction_add(reaction, user):
             await reaction.message.channel.send(f"Making the reservation between {times_selected[0]} and {times_selected[-1]}! Check your email for confirmation!") #! add times selected to print
             print(times_selected)
 
-            output = subprocess.check_output(f"{PATH_TO_RESERVE} {times_selected[0]} {times_selected[-1]} {user}", shell=True)
+            output = subprocess.check_output(f"python3 {PATH_TO_RESERVE} {times_selected[0]} {times_selected[-1]} {user}", shell=True)
             print(output)
 
 @client.command()

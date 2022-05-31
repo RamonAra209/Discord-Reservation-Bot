@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+
 NUM_EMOJIS = {0: f"{0}\N{COMBINING ENCLOSING KEYCAP}",
               1: f"{1}\N{COMBINING ENCLOSING KEYCAP}",
               2: f"{2}\N{COMBINING ENCLOSING KEYCAP}",
@@ -10,3 +12,17 @@ NUM_EMOJIS = {0: f"{0}\N{COMBINING ENCLOSING KEYCAP}",
               9: f"{9}\N{COMBINING ENCLOSING KEYCAP}",
               10: "\U0001F51F",
               }
+
+TODAY = date.today()
+TODAY_PLUS_THREE = TODAY + timedelta(days=3)
+
+ROOMS = {
+        107: 128080,
+        108: 128209,
+        110: 128210, 
+        111: 128212,
+        112: 128213,
+        113: 128211,
+        123: 128214,
+        210: 128215 
+        }
