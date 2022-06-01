@@ -12,7 +12,8 @@ import json
 
 load_dotenv("info.env")
 TOKEN = os.getenv('DISCORD_TOKEN')
-PATH_TO_RESERVE = "/Users/tahpramen/Developer/Personal\ Projects/LRT_V2/main.py"
+# PATH_TO_RESERVE = "/Users/tahpramen/Developer/Personal\ Projects/LRT_V2/main.py"
+PATH_TO_RESERVE = "/home/tahpramen/Developer/Library-Reservation-Tool-V2/main.py"
 
 intents = discord.Intents.default()
 intents.members = True
@@ -33,7 +34,8 @@ async def reserve(ctx):
 
     if str(ctx.author) in users_json:
         last_time_of_day_dt_obj = find_last_time_of_day(get_time_slots())
-        if NOW > last_time_of_day_dt_obj:
+        print(NOW)
+        if last_time_of_day_dt_obj == None:
             await ctx.send("Can't reserve a room, since theres no more room available for today!")
             return
         
@@ -126,11 +128,11 @@ async def on_reaction_add(reaction, user):
             await reaction.message.clear_reactions()
         elif reaction.emoji == '\U00002705':
             sent_message:str = (reaction.message.content).split('\n')[1:] 
-            print("TIMES")
-            for i in sent_message:
-                print(i)
+#           print("TIMES")
+#           for i in sent_message:
+#               print(i)
             times_selected = []
-            print()
+#            print()
             for react in reaction.message.reactions:
                 if react.count > 1:
                     for i in sent_message: 
@@ -139,9 +141,12 @@ async def on_reaction_add(reaction, user):
             await reaction.message.clear_reactions()
             await reaction.message.channel.send(f"Making the reservation between {times_selected[0]} and {times_selected[-1]}! Check your email for confirmation!") #! add times selected to print
             print(times_selected)
-
+            
             output = subprocess.check_output(f"python3 {PATH_TO_RESERVE} {times_selected[0]} {times_selected[-1]} {user}", shell=True)
             print(output)
+            with open('log.txt', 'a') as f:
+                f.write(f"{NOW} - {user}: {times_selected[0]} to {times_selected[-1]}\n")
+                f.close()
 
 @client.command()
 async def deleteme(ctx):

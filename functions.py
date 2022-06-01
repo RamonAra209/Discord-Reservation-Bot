@@ -76,7 +76,7 @@ def get_time_slots():
     json_object = response.json()
     return json_object["slots"]
 
-def find_last_time_of_day(time_slots_json) -> datetime:
+def find_last_time_of_day(time_slots_json):
     room_data = dict() 
     for i in range(len(time_slots_json)):
         if time_slots_json[i]['itemId'] == constants.ROOMS[107]:
@@ -91,6 +91,9 @@ def find_last_time_of_day(time_slots_json) -> datetime:
         else:
             break
     # print(f"Last time of day: {available_times[-1]}")
-    date_time_str = available_times[-1]
-    date_time_obj = datetime.strptime(date_time_str, '%Y-%m-%d %H:%M:%S')
-    return date_time_obj
+    if len(available_times) != 0:
+        date_time_str = available_times[-1]
+        date_time_obj = datetime.strptime(date_time_str, '%Y-%m-%d %H:%M:%S')
+        return date_time_obj
+    else:
+        return None
