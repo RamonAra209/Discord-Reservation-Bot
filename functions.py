@@ -25,11 +25,15 @@ def times_between_xy(start_time:datetime, end_time:datetime) -> list[datetime]:
         start_time += timedelta(minutes=30)
         times_between.append(start_time)
 
-    while True:
-        start_time += timedelta(hours=time_delta)
+    if start_time.hour == end_time.hour:
+        start_time += timedelta(minutes=30)
         times_between.append(start_time)
-        if start_time.hour == end_time.hour:
-            break
+    else:
+        while True:
+            start_time += timedelta(hours=time_delta)
+            times_between.append(start_time)
+            if start_time.hour == end_time.hour:
+                break
     
     if start_time.minute != end_time.minute: 
         times_between.append(datetime(NOW.year, NOW.month, NOW.day, hour=end_time.hour, minute=end_time.minute, second=0))
