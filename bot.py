@@ -33,6 +33,10 @@ async def reserve(ctx):
 
     if str(ctx.author) in users_json:
         last_time_of_day_dt_obj = find_last_time_of_day(get_time_slots())
+        if NOW > last_time_of_day_dt_obj:
+            await ctx.send("Can't reserve a room, since theres no more room available for today!")
+            return
+        
         list_of_times = times_between_xy(ceil_dt(dt=datetime(NOW.year, NOW.month, NOW.day, hour=NOW.hour, minute=NOW.minute, second=NOW.second),
                                 delta=timedelta(minutes=30)), last_time_of_day_dt_obj)
         str_of_times = [str(i).split(' ')[1] for i in list_of_times]
